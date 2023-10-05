@@ -1,17 +1,14 @@
-const Mysqli = require('mysqli');
+const Mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-let conn = new Mysqli({
-    Host: 'localhost', //IP/domain name 
-    post: 3306,  //MySql Database server port number
-    user: 'mega_user', //username 
-    passwd: '123456', //password 
-    db: 'ecommerce_db' //DB Name
+const db = Mysql.createConnection({
+    host: 'localhost',
+    user: 'burgerlicious',
+    password: 'burgerlicious',
+    database: 'burgerlicious',
+    port: 3306
 });
-
-
-let db = conn.emit(false, '');
 
 const secret = "1SBz93MsqTs7KgwARcB0I0ihpILIjk3w";
 

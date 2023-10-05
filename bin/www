@@ -3,7 +3,7 @@ const debug = require("debug")("mega-back:server");
 const http = require("http");
 
 //Get port from environment and store in Express.
-const port = normalizePort(process.env.PORT || "3636");
+const port = normalizePort(process.env.PORT || "3600");
 app.set("port", port);
 
 //Create HTTP server.
