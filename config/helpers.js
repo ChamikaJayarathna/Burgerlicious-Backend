@@ -2,18 +2,21 @@ const Mysql = require('mysql2');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcrypt');
 
-const db = Mysql.createConnection({
+const config = {
     host: 'localhost',
     user: 'burgerlicious',
     password: 'burgerlicious',
     database: 'burgerlicious',
     port: 3306
-});
+  };
+
+const db = Mysql.createConnection(config);
 
 const secret = "1SBz93MsqTs7KgwARcB0I0ihpILIjk3w";
 
 module.exports = {
     database: db,
+    config: config,
     secret: secret,
     validJWTNeeded: (req, res, next) => {
         if (req.headers['authorization']) {

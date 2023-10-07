@@ -40,16 +40,25 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 
 // Import Routes
-const usersRouter = require("./routes/users");
-const productsRouter = require("./routes/products");
-const authRouter = require("./routes/auth");
-const orderRouter = require("./routes/order");
 const adminOrdersRouter = require("./routes/adminOrders");
+const adminIngredientsRouter = require("./routes/adminIngredients");
+const userRoute = require("./routes/users");
+const ingredientsRoute = require("./routes/ingredients");
+const categoriesRoute = require("./routes/categories");
+const orderRoute = require("./routes/orders");
+const reviewRoute = require("./routes/orderreviews");
+const customizationRoute = require("./routes/ordercustamization");
+const authenticateRoute = require("./routes/authenticate");
 
-app.use("/api/users", usersRouter);
-app.use("/api/products", productsRouter);
-app.use("/api/auth", authRouter);
-app.use("/api/orders", orderRouter);
+
 app.use("/admin/orders",adminOrdersRouter);
+app.use("/admin/ingredients", adminIngredientsRouter);
+app.use("/api", userRoute);
+app.use("/api", ingredientsRoute);
+app.use("/api", categoriesRoute);
+app.use("/api", orderRoute);
+app.use("/api", reviewRoute);
+app.use("/api", customizationRoute);
+app.use("/api", authenticateRoute);
 
 module.exports = app;
