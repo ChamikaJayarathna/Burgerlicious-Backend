@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const {database} = require('../config/helpers');
+const { database } = require('../config/helpers');
 
 router.get('/', (req, res) => {
 
@@ -9,7 +9,7 @@ router.get('/', (req, res) => {
         if (err) {
             console.log("Error Retrieving Orders");
         }
-        if (res) {
+        if (result) {
             res.send({
                 message: 'All orders data',
                 data: result
@@ -49,7 +49,7 @@ router.get('/ingredients', (req, res) => {
         if (err) {
             console.log("Error Retrieving ingredients");
         }
-        if (res) {
+        if (result) {
             res.send({
                 message: 'All ingredients data',
                 data: result
@@ -67,7 +67,7 @@ router.get('/ingredients/:id', (req, res) => {
             console.log("Error Retrieving ingredient");
             console.log(err);
         }
-        if (res) {
+        if (result) {
             res.send({
                 message: 'ingredient Data Retrieved',
                 data: result
@@ -81,7 +81,7 @@ router.post('/addOrderCustomizations', (req, res) => {
     let orderId = req.body.orderId;
     let data = req.body.data;
 
-    for (let i=0;i<data.length;i++) {
+    for (let i = 0; i < data.length; i++) {
 
         let product = data[i];
         database.query("insert into ordercustomizations (OrderID,Quantity,Subtotal,IngredientID) values (?,?,?,?)", [parseInt(orderId), product.Quantity, product.Subtotal, parseInt(product.IngredientID)], (err, result) => {
@@ -99,6 +99,33 @@ router.post('/addOrderCustomizations', (req, res) => {
 
 
 });
+
+router.delete('/deleteOrder/:id', (req, res) => {
+
+    let id = parseInt(req.params.id);
+    database.query("delete from orderCustomizations where orderID = ?", [id], (err, result) => {
+        if (err) {
+            console.log("Error deleting order from orderCustomizations table");
+            console.log(err);
+        }
+        if (result) {
+            database.query("delete from orders where orderID = ?", [id], (err2, result2) => {
+                if (err2) {
+                    console.log("Error deleting order from orders table");
+                    console.log(err2);
+                }
+                if (result2) {
+                    res.send({
+                        message: 'Deleted order successfully',
+
+                    });
+                }
+            });
+        }
+
+    });
+});
+
 
 
 
