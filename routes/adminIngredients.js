@@ -3,6 +3,7 @@ const router = express.Router();
 const { database } = require("../config/helpers");
 
 const multer = require('multer');
+const fs = require('fs');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -36,20 +37,37 @@ router.get("/", (req, res) => {
 router.delete('/deleteIngredient/:id', (req, res) => {
   const ingredientID = parseInt(req.params.id);
 
-  database.query("DELETE FROM ordercustomizations WHERE IngredientID = ?", [ingredientID], (err, result) => {
+  database.query("SELECT ImageURL FROM ingredients WHERE IngredientID = ?", [ingredientID], (err, result) => {
     if (err) {
-      console.log("Error deleting related records from ordercustomizations table");
+      console.log("Error retrieving image URL for the ingredient");
       console.log(err);
-      res.status(500).json({ error: "Failed to delete related records" });
-    } 
-    else {
-      database.query("DELETE FROM ingredients WHERE IngredientID = ?", [ingredientID], (err2, result2) => {
-        if (err2) {
-          console.log("Error deleting ingredient from ingredients table");
-          console.log(err2);
-          res.status(500).json({ error: "Failed to delete ingredient" });
+      res.status(500).json({ error: "Failed to delete ingredient" });
+    } else {
+      const imageUrl = result[0].ImageURL;
+
+      database.query("DELETE FROM ordercustomizations WHERE IngredientID = ?", [ingredientID], (err, result) => {
+        if (err) {
+          console.log("Error deleting related records from ordercustomizations table");
+          console.log(err);
+          res.status(500).json({ error: "Failed to delete related records" });
         } else {
-          res.json({ message: 'Deleted ingredient successfully' });
+          database.query("DELETE FROM ingredients WHERE IngredientID = ?", [ingredientID], (err, result) => {
+            if (err) {
+              console.log("Error deleting ingredient from ingredients table");
+              console.log(err);
+              res.status(500).json({ error: "Failed to delete ingredient" });
+            } else {
+              fs.unlink('ingredientImages/' + imageUrl, (err) => {
+                if (err) {
+                  console.log("Error deleting image file");
+                  console.log(err);
+                  res.status(500).json({ error: "Failed to delete image file" });
+                } else {
+                  res.json({ message: 'Deleted ingredient successfully' });
+                }
+              });
+            }
+          });
         }
       });
     }
@@ -89,9 +107,6 @@ router.post('/addIngredient', (req, res) => {
     res.json({ ingredientID: result.insertId });
   });
 });
-
-
-
 
 
 module.exports = router;
