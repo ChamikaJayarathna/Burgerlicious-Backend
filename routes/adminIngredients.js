@@ -17,7 +17,6 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage: storage });
 
-
 router.get("/", (req, res) => {
   let query = "select * from ingredients";
   database.query(query, (err, result) => {

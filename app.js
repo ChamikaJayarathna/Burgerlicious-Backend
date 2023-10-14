@@ -38,6 +38,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
+app.use('/ingredientImages', express.static(path.join(__dirname, 'ingredientImages')));
 
 // Import Routes
 const adminOrdersRouter = require("./routes/adminOrders");
@@ -62,3 +63,5 @@ app.use("/api", customizationRoute);
 app.use("/api", authenticateRoute);
 
 module.exports = app;
+
+
