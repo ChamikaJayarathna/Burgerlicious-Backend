@@ -39,6 +39,7 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, "public")));
 app.use('/ingredientImages', express.static(path.join(__dirname, 'ingredientImages')));
+app.use('/productImages', express.static(path.join(__dirname, 'productImages')));
 
 // Import Routes
 const adminOrdersRouter = require("./routes/adminOrders");
@@ -51,6 +52,7 @@ const reviewRoute = require("./routes/orderreviews");
 const customizationRoute = require("./routes/ordercustamization");
 const authenticateRoute = require("./routes/authenticate");
 const productRoute = require("./routes/products");
+const adminProductsRouter = require("./routes/adminProducts");
 
 
 app.use("/admin/orders",adminOrdersRouter);
@@ -63,6 +65,7 @@ app.use("/api", reviewRoute);
 app.use("/api", customizationRoute);
 app.use("/api", authenticateRoute);
 app.use("/api/products", productRoute);
+app.use("/admin/products", adminProductsRouter);
 
 module.exports = app;
 
