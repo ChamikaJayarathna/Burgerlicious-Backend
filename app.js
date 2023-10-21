@@ -50,6 +50,7 @@ const orderRoute = require("./routes/orders");
 const reviewRoute = require("./routes/orderreviews");
 const customizationRoute = require("./routes/ordercustamization");
 const authenticateRoute = require("./routes/authenticate");
+const productRoute = require("./routes/products");
 
 
 app.use("/admin/orders",adminOrdersRouter);
@@ -61,6 +62,7 @@ app.use("/api", orderRoute);
 app.use("/api", reviewRoute);
 app.use("/api", customizationRoute);
 app.use("/api", authenticateRoute);
+app.use("/api/products", productRoute);
 
 module.exports = app;
 

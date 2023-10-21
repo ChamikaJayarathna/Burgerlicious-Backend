@@ -108,4 +108,56 @@ router.post('/addIngredient', (req, res) => {
 });
 
 
+// PUT - Update Ingredient Image and Record
+router.put('/updateIngredient/:id', upload.single('image'), (req, res) => {
+  const ingredientID = parseInt(req.params.id);
+  const { IngredientName, Price, Description, CategoryID } = req.body;
+  const newImage = req.file;
+
+  if (!newImage) {
+    return res.status(400).json({ error: 'New image is required for update' });
+  }
+
+  database.query("SELECT ImageURL FROM ingredients WHERE IngredientID = ?", [ingredientID], (err, result) => {
+    if (err) {
+      console.log("Error checking if ingredient exists");
+      console.log(err);
+      return res.status(500).json({ error: "Failed to update ingredient" });
+    }
+
+    if (result.length === 0) {
+      return res.status(404).json({ error: "Ingredient not found" });
+    }
+
+    const imageUrl = result[0].ImageURL;
+
+    const updateImageQuery = 'UPDATE ingredients SET ImageURL = ? WHERE IngredientID = ?';
+    database.query(updateImageQuery, [newImage.filename, ingredientID], (error, updateImageResult) => {
+      if (error) {
+        console.log("Error updating image URL");
+        console.log(error);
+        return res.status(500).json({ error });
+      }
+
+      fs.unlink('ingredientImages/' + imageUrl, (err) => {
+        if (err) {
+          console.log("Error deleting old image file");
+          console.log(err);
+        }
+      });
+
+      const updateRecordQuery = 'UPDATE ingredients SET IngredientName = ?, Price = ?, Description = ?, CategoryID = ? WHERE IngredientID = ?';
+      database.query(updateRecordQuery, [IngredientName, Price, Description, CategoryID, ingredientID], (recordError, updateRecordResult) => {
+        if (recordError) {
+          console.log("Error updating ingredient record");
+          console.log(recordError);
+          return res.status(500).json({ error: recordError });
+        }
+        return res.json({ message: 'Updated ingredient successfully' });
+      });
+    });
+  });
+});
+
+
 module.exports = router;
