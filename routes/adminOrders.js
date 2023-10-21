@@ -126,7 +126,41 @@ router.delete('/deleteOrder/:id', (req, res) => {
     });
 });
 
+router.get('/:id', (req, res) => {
 
+    let id = parseInt(req.params.id);
+    database.query("select OrderID, users.Username, DATE_FORMAT(OrderDate, '%Y-%m-%d %H:%i:%s') AS OrderDate, TotalAmount, Status from orders inner join users on orders.UserID=users.UserID where orderID = ?", [id], (err, result) => {
+        if (err) {
+            console.log("Error Retrieving Order");
+            console.log(err);
+        }
+        if (result) {
+            res.send({
+                message: 'Order Data Retrieved',
+                data: result
+            });
+        }
+
+    });
+});
+
+router.put('/updateOrderStatusById/:id', (req, res) => {
+
+    let id = parseInt(req.params.id);
+    let Status = req.body.Status;
+    database.query("update orders set Status = ? where orderID = ?", [Status,id], (err, result) => {
+        if (err) {
+            console.log("Error Updating Order Status");
+            console.log(err);
+        }
+        if (result) {
+            res.send({
+                message: 'Updated Order Status',
+            });
+        }
+
+    });
+});
 
 
 module.exports = router;
