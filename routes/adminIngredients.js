@@ -108,6 +108,50 @@ router.post('/addIngredient', (req, res) => {
 });
 
 
+
+
+router.get('/:id', (req, res) => {
+
+  let id = parseInt(req.params.id);
+  database.query("select * from ingredients where IngredientID=?", [id], (err, result) => {
+      if (err) {
+          console.log("Error Retrieving Ingredient");
+          console.log(err);
+      }
+      if (result) {
+          res.send({
+              message: 'Ingredient Data Retrieved',
+              data: result
+          });
+      }
+
+  });
+});
+
+
+
+
+// PUT - Update Ingredient Image and Record
+router.put('/updateIngredientWithoutImage/:id', (req, res) => {
+  const ingredientID = parseInt(req.params.id);
+  const { IngredientName, Price, Description, CategoryID } = req.body;
+
+      const updateRecordQuery = 'UPDATE ingredients SET IngredientName = ?, Price = ?, Description = ?, CategoryID = ? WHERE IngredientID = ?';
+      database.query(updateRecordQuery, [IngredientName, Price, Description, CategoryID, ingredientID], (recordError, updateRecordResult) => {
+        if (recordError) {
+          console.log("Error updating ingredient record");
+          console.log(recordError);
+          return res.status(500).json({ error: recordError });
+        }
+        return res.json({ message: 'Updated ingredient successfully' });
+      });
+});
+
+
+
+
+
+
 // PUT - Update Ingredient Image and Record
 router.put('/updateIngredient/:id', upload.single('image'), (req, res) => {
   const ingredientID = parseInt(req.params.id);
