@@ -129,9 +129,7 @@ router.get('/:id', (req, res) => {
 });
 
 
-
-
-// PUT - Update Ingredient Image and Record
+// PUT - Update Ingredient Without Image and Record
 router.put('/updateIngredientWithoutImage/:id', (req, res) => {
   const ingredientID = parseInt(req.params.id);
   const { IngredientName, Price, Description, CategoryID } = req.body;
@@ -148,19 +146,15 @@ router.put('/updateIngredientWithoutImage/:id', (req, res) => {
 });
 
 
-
-
-
-
 // PUT - Update Ingredient Image and Record
-router.put('/updateIngredient/:id', upload.single('image'), (req, res) => {
+router.put('/updateIngredient/:id', (req, res) => {
   const ingredientID = parseInt(req.params.id);
-  const { IngredientName, Price, Description, CategoryID } = req.body;
-  const newImage = req.file;
+  const { IngredientName, Price, Description, CategoryID, ImageURL } = req.body;
+  // const newImage = req.file;
 
-  if (!newImage) {
-    return res.status(400).json({ error: 'New image is required for update' });
-  }
+  // if (!newImage) {
+  //   return res.status(400).json({ error: 'New image is required for update' });
+  // }
 
   database.query("SELECT ImageURL FROM ingredients WHERE IngredientID = ?", [ingredientID], (err, result) => {
     if (err) {
@@ -176,7 +170,7 @@ router.put('/updateIngredient/:id', upload.single('image'), (req, res) => {
     const imageUrl = result[0].ImageURL;
 
     const updateImageQuery = 'UPDATE ingredients SET ImageURL = ? WHERE IngredientID = ?';
-    database.query(updateImageQuery, [newImage.filename, ingredientID], (error, updateImageResult) => {
+    database.query(updateImageQuery, [ImageURL, ingredientID], (error, updateImageResult) => {
       if (error) {
         console.log("Error updating image URL");
         console.log(error);
