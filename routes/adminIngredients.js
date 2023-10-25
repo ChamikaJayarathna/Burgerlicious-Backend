@@ -18,7 +18,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 
 router.get("/", (req, res) => {
-  let query = "select * from ingredients";
+  let query = "select * from ingredients inner join categories on categories.CategoryID=ingredients.CategoryID";
   database.query(query, (err, result) => {
     if (err) {
       console.log("Error Retrieving Ingredients");
@@ -109,6 +109,22 @@ router.post('/addIngredient', (req, res) => {
 
 
 
+router.get("/getAllCategories", (req, res) => {
+  let query = "select * from categories";
+  database.query(query, (err, result) => {
+    if (err) {
+      console.log("Error Retrieving Categories");
+    }
+    if (res) {
+      res.send({
+        message: "All categories data",
+        data: result,
+      });
+    }
+  });
+});
+
+
 
 router.get('/:id', (req, res) => {
 
@@ -196,6 +212,8 @@ router.put('/updateIngredient/:id', (req, res) => {
     });
   });
 });
+
+
 
 
 module.exports = router;
