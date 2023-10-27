@@ -100,6 +100,7 @@ router.post('/addOrderCustomizations', (req, res) => {
 
 });
 
+
 router.delete('/deleteOrder/:id', (req, res) => {
 
     let id = parseInt(req.params.id);
@@ -109,15 +110,23 @@ router.delete('/deleteOrder/:id', (req, res) => {
             console.log(err);
         }
         if (result) {
-            database.query("delete from orders where orderID = ?", [id], (err2, result2) => {
+            database.query("delete from orderreviews where orderID = ?", [id], (err2, result2) => {
                 if (err2) {
-                    console.log("Error deleting order from orders table");
+                    console.log("Error deleting order review from orderreviews table");
                     console.log(err2);
                 }
                 if (result2) {
-                    res.send({
-                        message: 'Deleted order successfully',
-
+                    database.query("delete from orders where orderID = ?", [id], (err3, result3) => {
+                        if (err2) {
+                            console.log("Error deleting order from orders table");
+                            console.log(err3);
+                        }
+                        if (result3) {
+                            res.send({
+                                message: 'Deleted order successfully',
+        
+                            });
+                        }
                     });
                 }
             });
@@ -162,5 +171,39 @@ router.put('/updateOrderStatusById/:id', (req, res) => {
     });
 });
 
+router.get('/getAllOrderItemsByOrderID/:id', (req, res) => {
 
+    let id = parseInt(req.params.id);
+    database.query("select * from ordercustomizations inner join ingredients on ingredients.IngredientID = ordercustomizations.IngredientID where orderID = ?", [id], (err, result) => {
+        if (err) {
+            console.log("Error Retrieving Order Items");
+            console.log(err);
+        }
+        if (result) {
+            res.send({
+                message: 'Order Items Data Retrieved',
+                data: result
+            });
+        }
+
+    });
+});
+
+router.get('/getOrderForViewById/:id', (req, res) => {
+
+    let id = parseInt(req.params.id);
+    database.query("select OrderID, users.Username, users.Contact, users.Email , users.UserID, DATE_FORMAT(OrderDate, '%Y-%m-%d %H:%i:%s') AS OrderDate, TotalAmount, Status from orders inner join users on orders.UserID=users.UserID  where orderID = ?", [id], (err, result) => {
+        if (err) {
+            console.log("Error Retrieving Order");
+            console.log(err);
+        }
+        if (result) {
+            res.send({
+                message: 'Order Data Retrieved',
+                data: result
+            });
+        }
+
+    });
+});
 module.exports = router;
