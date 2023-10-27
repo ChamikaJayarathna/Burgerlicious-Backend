@@ -53,9 +53,10 @@ const customizationRoute = require("./routes/ordercustamization");
 const authenticateRoute = require("./routes/authenticate");
 const productRoute = require("./routes/products");
 const adminProductsRouter = require("./routes/adminProducts");
-
+const adminDashboardRouter = require("./routes/adminDashboard");
 
 app.use("/admin/orders",adminOrdersRouter);
+app.use("/admin/dashboard",adminDashboardRouter);
 app.use("/admin/ingredients", adminIngredientsRouter);
 app.use("/api", userRoute);
 app.use("/api", ingredientsRoute);
