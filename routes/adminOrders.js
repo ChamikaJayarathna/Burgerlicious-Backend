@@ -19,6 +19,24 @@ router.get('/', (req, res) => {
     });
 });
 
+router.get('/:id', (req, res) => {
+
+    let id = parseInt(req.params.id);
+    database.query("select OrderID, users.Username, users.UserID, DATE_FORMAT(OrderDate, '%Y-%m-%d %H:%i:%s') AS OrderDate, TotalAmount, Status from orders inner join users on orders.UserID=users.UserID where orders.OrderID = ?", [id], (err, result) => {
+        if (err) {
+            console.log("Error Retrieving Order");
+            console.log(err);
+        }
+        if (result) {
+            res.send({
+                message: 'Order Data Retrieved',
+                data: result
+            });
+        }
+
+    });
+});
+
 router.post('/addOrder', (req, res) => {
     let UserID = req.body.UserID;
     let TotalAmount = req.body.TotalAmount;
@@ -135,23 +153,7 @@ router.delete('/deleteOrder/:id', (req, res) => {
     });
 });
 
-router.get('/:id', (req, res) => {
 
-    let id = parseInt(req.params.id);
-    database.query("select OrderID, users.Username, DATE_FORMAT(OrderDate, '%Y-%m-%d %H:%i:%s') AS OrderDate, TotalAmount, Status from orders inner join users on orders.UserID=users.UserID where orderID = ?", [id], (err, result) => {
-        if (err) {
-            console.log("Error Retrieving Order");
-            console.log(err);
-        }
-        if (result) {
-            res.send({
-                message: 'Order Data Retrieved',
-                data: result
-            });
-        }
-
-    });
-});
 
 router.put('/updateOrderStatusById/:id', (req, res) => {
 
@@ -206,4 +208,101 @@ router.get('/getOrderForViewById/:id', (req, res) => {
 
     });
 });
+
+router.get('/users', (req, res) => {
+
+    let query = 'select * from users';
+    database.query(query, (err, result) => {
+        if (err) {
+            console.log("Error Retrieving users");
+        }
+        if (result) {
+            res.send({
+                message: 'All users data',
+                data: result
+            });
+        }
+
+    });
+});
+
+router.put('/updateOrderById/:id', (req, res) => {
+
+    let id = parseInt(req.params.id);
+    let TotalAmount=req.body.TotalAmount;
+    let UserID=req.body.UserID;
+
+    database.query("update orders set UserID=?, TotalAmount=? where orderID = ?", [UserID, TotalAmount,id], (err, result) => {
+        if (err) {
+            console.log("Error Updating Order");
+            console.log(err);
+        }
+        if (result) {
+            res.send({
+                message: 'Order Data Updated',
+                data: result
+            });
+        }
+
+    });
+});
+
+router.get('/getOrderItemById/:id', (req, res) => {
+
+    let id = parseInt(req.params.id);
+    database.query("select * from ordercustomizations inner join ingredients on ingredients.IngredientID = ordercustomizations.IngredientID where OrderCustomizationID = ?", [id], (err, result) => {
+        if (err) {
+            console.log("Error Retrieving Order Item");
+            console.log(err);
+        }
+        if (result) {
+            res.send({
+                message: 'Order Item Data Retrieved',
+                data: result
+            });
+        }
+
+    });
+});
+
+router.put('/updateOrderItemById/:id', (req, res) => {
+
+    let id = parseInt(req.params.id);
+    let Quantity=req.body.Quantity;
+    let Subtotal=req.body.Subtotal;
+    database.query("update ordercustomizations set Quantity =?, Subtotal =? where OrderCustomizationID = ?", [Quantity,Subtotal,id], (err, result) => {
+        if (err) {
+            console.log("Error Updating Order Items");
+            console.log(err);
+        }
+        if (result) {
+            res.send({
+                message: 'Order Items Data Updated',
+                data: result
+            });
+        }
+
+    });
+});
+
+router.put('/updateOrderTotalAmount/:id', (req, res) => {
+
+    let id = parseInt(req.params.id);
+    let totalAmountCalculate=req.body.totalAmountCalculate;
+    console.log(totalAmountCalculate);
+    database.query("update orders set TotalAmount =? where OrderID = ?", [totalAmountCalculate,id], (err, result) => {
+        if (err) {
+            console.log("Error Updating Order TotalAmount");
+            console.log(err);
+        }
+        if (result) {
+            res.send({
+                message: 'Order TotalAmount Data Updated',
+                data: result
+            });
+        }
+
+    });
+});
+
 module.exports = router;
