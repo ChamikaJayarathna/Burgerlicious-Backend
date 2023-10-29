@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2/promise'); // Import the mysql2/promise package
+const mysql = require('mysql2/promise');
+const bcrypt = require('bcrypt');
 
 const {config} = require('../config/helpers'); 
 const { database } = require('../config/helpers');
@@ -133,28 +134,60 @@ router.get('/getUsersById/:id', (req, res) => {
 });
 
 
-router.put('/updateUserById/:id', (req, res) => {
+// router.put('/updateUserById/:id', (req, res) => {
 
-let id = parseInt(req.params.id);
-let Username = req.body.Username;
-let PasswordHash = req.body.PasswordHash;
-let Contact = req.body.Contact;
-let Email  = req.body.Email ;
-let FirstName = req.body.FirstName;
-let LastName = req.body.LastName;
+// let id = parseInt(req.params.id);
+// let Username = req.body.Username;
+// let PasswordHash = req.body.PasswordHash;
+// let Contact = req.body.Contact;
+// let Email  = req.body.Email ;
+// let FirstName = req.body.FirstName;
+// let LastName = req.body.LastName;
+// const hashedPassword = bcrypt.hash(PasswordHash, 10);
 
-database.query("update users set Username = ?, PasswordHash=?, Contact=?, Email=?, FirstName=?, LastName=? where UserID = ?", [Username,PasswordHash,Contact,Email,FirstName,LastName,id], (err, result) => {
-    if (err) {
-        console.log("Error Updating Order Status");
-        console.log(err);
-    }
-    if (result) {
-        res.send({
-            message: 'Updated Order Status',
-        });
-    }
+// database.query("update users set Username = ?, PasswordHash=?, Contact=?, Email=?, FirstName=?, LastName=? where UserID = ?", [Username,hashedPassword,Contact,Email,FirstName,LastName,id], (err, result) => {
+//     if (err) {
+//         console.log("Error Updating Order Status");
+//         console.log(err);
+//     }
+//     if (result) {
+//         res.send({
+//             message: 'Updated Order Status',
+//         });
+//     }
 
-});
+// });
+// });
+
+
+
+router.put('/updateUserById/:id', async (req, res) => {
+  try {
+    let id = parseInt(req.params.id);
+    let Username = req.body.Username;
+    let PasswordHash = req.body.PasswordHash;
+    let Contact = req.body.Contact;
+    let Email  = req.body.Email ;
+    let FirstName = req.body.FirstName;
+    let LastName = req.body.LastName;
+
+    // Get a connection from the pool
+    const connection = await pool.getConnection();
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(PasswordHash, 10);
+  
+    // Insert the new user into the database
+    await connection.query("update users set Username = ?, PasswordHash=?, Contact=?, Email=?, FirstName=?, LastName=? where UserID = ?", [Username,hashedPassword,Contact,Email,FirstName,LastName,id]);
+
+    // Release the connection
+    connection.release();
+
+    res.json({ message: 'Updated User' });
+  } catch (error) {
+    console.error('Error Updating User', error.message);
+    res.status(500).json({ error: 'Error Updating User' });
+  }
 });
 
 

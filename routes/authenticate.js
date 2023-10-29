@@ -11,7 +11,7 @@ const pool = mysql.createPool(config);
 
 router.post('/signup', async (req, res) => {
   try {
-    const { Name, Email, Password} = req.body;
+    const { Name, Email, Password, Contact, FirstName, LastName} = req.body;
 
     // Get a connection from the pool
     const connection = await pool.getConnection();
@@ -25,9 +25,9 @@ router.post('/signup', async (req, res) => {
 
     // Hash the password
     const hashedPassword = await bcrypt.hash(Password, 10);
-
+  
     // Insert the new user into the database
-    await connection.query('INSERT INTO users (Username, PasswordHash, Email) VALUES (?, ?, ?)', [Name, hashedPassword, Email]);
+    await connection.query('INSERT INTO users (Username, PasswordHash, Email, Contact, FirstName, LastName ) VALUES (?, ?, ?, ?, ?, ?)', [Name, hashedPassword, Email, Contact, FirstName, LastName ]);
 
     // Release the connection
     connection.release();
