@@ -19,23 +19,7 @@ router.get('/', (req, res) => {
     });
 });
 
-router.get('/:id', (req, res) => {
 
-    let id = parseInt(req.params.id);
-    database.query("select OrderID, users.Username, users.UserID, DATE_FORMAT(OrderDate, '%Y-%m-%d %H:%i:%s') AS OrderDate, TotalAmount, Status from orders inner join users on orders.UserID=users.UserID where orders.OrderID = ?", [id], (err, result) => {
-        if (err) {
-            console.log("Error Retrieving Order");
-            console.log(err);
-        }
-        if (result) {
-            res.send({
-                message: 'Order Data Retrieved',
-                data: result
-            });
-        }
-
-    });
-});
 
 router.post('/addOrder', (req, res) => {
     let UserID = req.body.UserID;
@@ -219,6 +203,26 @@ router.get('/users', (req, res) => {
         if (result) {
             res.send({
                 message: 'All users data',
+                data: result
+            });
+        }
+
+    });
+});
+
+router.get('/:id', (req, res) => {
+
+    let id = parseInt(req.params.id);
+    console.log(id);
+    console.log(req.params);
+    database.query("select OrderID, users.Username, users.UserID, DATE_FORMAT(OrderDate, '%Y-%m-%d %H:%i:%s') AS OrderDate, TotalAmount, Status from orders inner join users on orders.UserID=users.UserID where orders.OrderID = ?", [id], (err, result) => {
+        if (err) {
+            console.log("Error Retrieving Order");
+            console.log(err);
+        }
+        if (result) {
+            res.send({
+                message: 'Order Data Retrieved',
                 data: result
             });
         }
