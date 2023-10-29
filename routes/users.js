@@ -2,7 +2,8 @@ const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2/promise'); // Import the mysql2/promise package
 
-const {config} = require('../config/helpers'); // Import the MySQL configuration
+const {config} = require('../config/helpers'); 
+const { database } = require('../config/helpers');
 
 // Create a MySQL connection pool
 const pool = mysql.createPool(config);
@@ -111,5 +112,50 @@ router.delete('/users/:UserID', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while deleting the user and related records' });
   }
 });
+
+router.get('/getUsersById/:id', (req, res) => {
+
+  let UserID = parseInt(req.params.id);
+  console.log(UserID);
+  let query = "SELECT * from users where UserID= ?";
+  database.query(query, [UserID],(err, result) => {
+      if (err) {
+          console.log("Error Retrieving User");
+      }
+      if (result) {
+          res.send({
+              message: 'All User data',
+              data: result
+          });
+      }
+
+  });
+});
+
+
+router.put('/updateUserById/:id', (req, res) => {
+
+let id = parseInt(req.params.id);
+let Username = req.body.Username;
+let PasswordHash = req.body.PasswordHash;
+let Contact = req.body.Contact;
+let Email  = req.body.Email ;
+let FirstName = req.body.FirstName;
+let LastName = req.body.LastName;
+
+database.query("update users set Username = ?, PasswordHash=?, Contact=?, Email=?, FirstName=?, LastName=? where UserID = ?", [Username,PasswordHash,Contact,Email,FirstName,LastName,id], (err, result) => {
+    if (err) {
+        console.log("Error Updating Order Status");
+        console.log(err);
+    }
+    if (result) {
+        res.send({
+            message: 'Updated Order Status',
+        });
+    }
+
+});
+});
+
 
 module.exports = router;
