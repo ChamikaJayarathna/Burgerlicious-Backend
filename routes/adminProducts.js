@@ -152,4 +152,23 @@ router.put('/updateIngredient/:id', upload.single('image'), (req, res) => {
 });
 
 
+router.get('/getProductForViewById/:id', (req, res) => {
+
+  let id = parseInt(req.params.id);
+  database.query("select * from products where ProductID = ?", [id], (err, result) => {
+      if (err) {
+          console.log("Error Retrieving Product");
+          console.log(err);
+      }
+      if (result) {
+          res.send({
+              message: 'Product Data Retrieved',
+              data: result
+          });
+      }
+
+  });
+});
+
+
 module.exports = router;

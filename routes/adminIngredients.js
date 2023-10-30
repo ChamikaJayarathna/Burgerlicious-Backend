@@ -214,6 +214,25 @@ router.put('/updateIngredient/:id', (req, res) => {
 });
 
 
+router.get('/getIngredientForViewById/:id', (req, res) => {
+
+  let id = parseInt(req.params.id);
+  database.query("select * from ingredients where IngredientID = ?", [id], (err, result) => {
+      if (err) {
+          console.log("Error Retrieving Ingredient");
+          console.log(err);
+      }
+      if (result) {
+          res.send({
+              message: 'Ingredient Data Retrieved',
+              data: result
+          });
+      }
+
+  });
+});
+
+
 
 
 module.exports = router;
