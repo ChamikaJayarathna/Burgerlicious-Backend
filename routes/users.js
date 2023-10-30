@@ -134,33 +134,6 @@ router.get('/getUsersById/:id', (req, res) => {
 });
 
 
-// router.put('/updateUserById/:id', (req, res) => {
-
-// let id = parseInt(req.params.id);
-// let Username = req.body.Username;
-// let PasswordHash = req.body.PasswordHash;
-// let Contact = req.body.Contact;
-// let Email  = req.body.Email ;
-// let FirstName = req.body.FirstName;
-// let LastName = req.body.LastName;
-// const hashedPassword = bcrypt.hash(PasswordHash, 10);
-
-// database.query("update users set Username = ?, PasswordHash=?, Contact=?, Email=?, FirstName=?, LastName=? where UserID = ?", [Username,hashedPassword,Contact,Email,FirstName,LastName,id], (err, result) => {
-//     if (err) {
-//         console.log("Error Updating Order Status");
-//         console.log(err);
-//     }
-//     if (result) {
-//         res.send({
-//             message: 'Updated Order Status',
-//         });
-//     }
-
-// });
-// });
-
-
-
 router.put('/updateUserById/:id', async (req, res) => {
   try {
     let id = parseInt(req.params.id);

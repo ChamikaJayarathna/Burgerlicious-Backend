@@ -1,11 +1,50 @@
 const express = require('express');
 const router = express.Router();
-const mysql = require('mysql2/promise'); // Import the mysql2/promise package
-
-const {config} = require('../config/helpers'); // Import the MySQL configuration
-
-// Create a MySQL connection pool
+const mysql = require('mysql2/promise');
+const { database } = require('../config/helpers');
+const {config} = require('../config/helpers');
 const pool = mysql.createPool(config);
+
+
+router.get('/orders/ordersByUserId/:id', (req, res) => {
+
+  let UserID = parseInt(req.params.id);
+  console.log(UserID);
+  let query = "SELECT OrderID, DATE_FORMAT(OrderDate, '%Y-%m-%d %H:%i:%s') AS OrderDate, UserID, TotalAmount, Status from orders where UserID= ? order by OrderDate DESC";
+  database.query(query, [UserID],(err, result) => {
+      if (err) {
+          console.log("Error Retrieving Orders of the user");
+      }
+      if (result) {
+          res.send({
+              message: 'All orders data of the user',
+              data: result
+          });
+      }
+
+  });
+});
+
+
+router.get('/orders/orderById/:id', (req, res) => {
+
+  let orderId = parseInt(req.params.id);
+  console.log(orderId);
+  let query = "SELECT OrderID, UserID, DATE_FORMAT(OrderDate, '%Y-%m-%d %H:%i:%s') AS OrderDate, TotalAmount, Status from orders where OrderID= ?";
+  database.query(query, [orderId],(err, result) => {
+      if (err) {
+          console.log("Error Retrieving Order");
+      }
+      if (result) {
+          res.send({
+              message: 'All order data',
+              data: result
+          });
+      }
+
+  });
+});
+
 
 // GET orders
 router.get('/orders', async (req, res) => {
