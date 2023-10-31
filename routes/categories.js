@@ -7,6 +7,7 @@ const {config} = require('../config/helpers'); // Import the MySQL configuration
 // Create a MySQL connection pool
 const pool = mysql.createPool(config);
 
+
 // POST categories
 router.post('/categories', async (req, res) => {
   try {

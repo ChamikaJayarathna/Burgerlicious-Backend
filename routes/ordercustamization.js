@@ -26,6 +26,53 @@ router.get('/ordercustomizations', async (req, res) => {
   }
 });
 
+// GET categories
+router.get('/customize-categories', async (req, res) => {
+  try {
+    // Get a connection from the pool
+    const connection = await pool.getConnection();
+
+    // Query to fetch categories with isIngredient = 'yes' and level > 0
+    const sql = 'SELECT * FROM categories WHERE isIngredient = ? AND level > 0 ORDER BY level ASC';
+    const [rows] = await connection.query(sql, ['yes']);
+
+    // Release the connection
+    connection.release();
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Error retrieving categories:', error.message);
+    res.status(500).json({ error: 'An error occurred while fetching categories' });
+  }
+});
+
+// GET order review by ReviewID with ingredient names as an array
+router.get('/customize-categories/:CategoryID', async (req, res) => {
+  try {
+    const { CategoryID } = req.params; // Extract ReviewID from the URL parameters
+
+    // Get a connection from the pool
+    const connection = await pool.getConnection();
+
+    // SQL query to fetch the order review by ReviewID with ingredient information
+    const query = `
+      SELECT * from ingredients where CategoryID = ?;`;
+
+    // Execute the query with ReviewID as a parameter
+    const [rows] = await connection.query(query, [CategoryID]);
+
+    // Release the connection
+    connection.release();
+
+      // Return the modified JSON response
+      res.json(rows);
+  } catch (error) {
+    console.error('Error retrieving order review:', error.message);
+    res.status(500).json({ error: 'An error occurred while fetching the order review' });
+  }
+});
+
+
 // POST order customizations
 router.post('/ordercustomizations', async (req, res) => {
   try {
