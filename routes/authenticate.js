@@ -11,13 +11,13 @@ const pool = mysql.createPool(config);
 
 router.post('/signup', async (req, res) => {
   try {
-    const { Name, Email, Password, Contact, FirstName, LastName} = req.body;
+    const { Username, Email, Password, Contact, FirstName, LastName} = req.body;
 
     // Get a connection from the pool
     const connection = await pool.getConnection();
 
     // Check if the user already exists
-    const [existingUserRows] = await connection.query('SELECT * FROM users WHERE Username = ?', [Name]);
+    const [existingUserRows] = await connection.query('SELECT * FROM users WHERE Username = ?', [Username]);
     if (existingUserRows.length > 0) {
       connection.release();
       return res.status(400).json({ error: 'Username already exists' });
@@ -27,7 +27,7 @@ router.post('/signup', async (req, res) => {
     const hashedPassword = await bcrypt.hash(Password, 10);
   
     // Insert the new user into the database
-    await connection.query('INSERT INTO users (Username, PasswordHash, Email, Contact, FirstName, LastName ) VALUES (?, ?, ?, ?, ?, ?)', [Name, hashedPassword, Email, Contact, FirstName, LastName ]);
+    await connection.query('INSERT INTO users (Username, PasswordHash, Email, Contact, FirstName, LastName ) VALUES (?, ?, ?, ?, ?, ?)', [Username, hashedPassword, Email, Contact, FirstName, LastName ]);
 
     // Release the connection
     connection.release();
@@ -41,13 +41,15 @@ router.post('/signup', async (req, res) => {
 
 router.post('/signin', async (req, res) => {
   try {
-    const { Name, Password } = req.body;
+    const { Username, Password } = req.body;
+    console.log(Username);
+    console.log(Password);
 
     // Get a connection from the pool
     const connection = await pool.getConnection();
 
     // Retrieve user by username
-    const [userRows] = await connection.query('SELECT * FROM users WHERE Username = ?', [Name]);
+    const [userRows] = await connection.query('SELECT * FROM users WHERE Username = ?', [Username]);
     if (userRows.length === 0) {
       connection.release();
       return res.status(401).json({ error: 'Invalid credentials' });

@@ -99,47 +99,94 @@ router.post('/addProduct', (req, res) => {
   });
 });
 
-
-// PUT - Update Ingredient Image and Record
-router.put('/updateIngredient/:id', upload.single('image'), (req, res) => {
-  const ingredientID = parseInt(req.params.id);
-  const { IngredientName, Price, Description, CategoryID } = req.body;
-  const newImage = req.file;
-
-  if (!newImage) {
-    return res.status(400).json({ error: 'New image is required for update' });
-  }
-
-  database.query("SELECT ImageURL FROM ingredients WHERE IngredientID = ?", [ingredientID], (err, result) => {
+router.get("/getAllCategories", (req, res) => {
+  let query = "select * from categories";
+  database.query(query, (err, result) => {
     if (err) {
-      console.log("Error checking if ingredient exists");
+      console.log("Error Retrieving Categories");
+    }
+    if (res) {
+      res.send({
+        message: "All categories data",
+        data: result,
+      });
+    }
+  });
+});
+
+
+router.get('/:id', (req, res) => {
+
+  let id = parseInt(req.params.id);
+  database.query("select * from products where ProductID=?", [id], (err, result) => {
+      if (err) {
+          console.log("Error Retrieving Product");
+          console.log(err);
+      }
+      if (result) {
+          res.send({
+              message: 'Product Data Retrieved',
+              data: result
+          });
+      }
+
+  });
+});
+
+
+
+// PUT - Update Product Without Image and Record
+router.put('/updateProductWithoutImage/:id', (req, res) => {
+  const ProductID = parseInt(req.params.id);
+  const { ProductName, Price, Description, Rating, CategoryID } = req.body;
+
+      const updateRecordQuery = 'UPDATE products SET ProductName = ?, Price = ?, Description = ?, Rating = ?, CategoryID = ? WHERE ProductID = ?';
+      database.query(updateRecordQuery, [ProductName, Price, Description, Rating, CategoryID, ProductID], (recordError, updateRecordResult) => {
+        if (recordError) {
+          console.log("Error updating products record");
+          console.log(recordError);
+          return res.status(500).json({ error: recordError });
+        }
+        return res.json({ message: 'Updated products successfully' });
+      });
+});
+
+
+// PUT - Update Product Image and Record
+router.put('/updateProduct/:id', (req, res) => {
+  const  ProductID  = parseInt(req.params.id);
+  const { ProductName, Price, Description, ImageURL, Rating, CategoryID  } = req.body;
+
+  database.query("SELECT ImageURL FROM products WHERE ProductID = ?", [ProductID], (err, result) => {
+    if (err) {
+      console.log("Error checking if product exists");
       console.log(err);
-      return res.status(500).json({ error: "Failed to update ingredient" });
+      return res.status(500).json({ error: "Failed to update product" });
     }
 
     if (result.length === 0) {
-      return res.status(404).json({ error: "Ingredient not found" });
+      return res.status(404).json({ error: "product not found" });
     }
 
     const imageUrl = result[0].ImageURL;
 
-    const updateImageQuery = 'UPDATE ingredients SET ImageURL = ? WHERE IngredientID = ?';
-    database.query(updateImageQuery, [newImage.filename, ingredientID], (error, updateImageResult) => {
+    const updateImageQuery = 'UPDATE products SET ImageURL = ? WHERE ProductID = ?';
+    database.query(updateImageQuery, [ImageURL, ProductID], (error, updateImageResult) => {
       if (error) {
         console.log("Error updating image URL");
         console.log(error);
         return res.status(500).json({ error });
       }
 
-      fs.unlink('ingredientImages/' + imageUrl, (err) => {
+      fs.unlink('productImages/' + imageUrl, (err) => {
         if (err) {
           console.log("Error deleting old image file");
           console.log(err);
         }
       });
 
-      const updateRecordQuery = 'UPDATE ingredients SET IngredientName = ?, Price = ?, Description = ?, CategoryID = ? WHERE IngredientID = ?';
-      database.query(updateRecordQuery, [IngredientName, Price, Description, CategoryID, ingredientID], (recordError, updateRecordResult) => {
+      const updateRecordQuery = 'UPDATE products SET ProductName = ?, Price = ?, Description = ?, Rating = ?, CategoryID = ? WHERE ProductID = ?';
+      database.query(updateRecordQuery, [ProductName, Price, Description, Rating, CategoryID, ProductID], (recordError, updateRecordResult) => {
         if (recordError) {
           console.log("Error updating ingredient record");
           console.log(recordError);
@@ -172,3 +219,57 @@ router.get('/getProductForViewById/:id', (req, res) => {
 
 
 module.exports = router;
+
+
+
+
+// PUT - Update Ingredient Image and Record
+// router.put('/updateIngredient/:id', upload.single('image'), (req, res) => {
+//   const ingredientID = parseInt(req.params.id);
+//   const { IngredientName, Price, Description, CategoryID } = req.body;
+//   const newImage = req.file;
+
+//   if (!newImage) {
+//     return res.status(400).json({ error: 'New image is required for update' });
+//   }
+
+//   database.query("SELECT ImageURL FROM ingredients WHERE IngredientID = ?", [ingredientID], (err, result) => {
+//     if (err) {
+//       console.log("Error checking if ingredient exists");
+//       console.log(err);
+//       return res.status(500).json({ error: "Failed to update ingredient" });
+//     }
+
+//     if (result.length === 0) {
+//       return res.status(404).json({ error: "Ingredient not found" });
+//     }
+
+//     const imageUrl = result[0].ImageURL;
+
+//     const updateImageQuery = 'UPDATE ingredients SET ImageURL = ? WHERE IngredientID = ?';
+//     database.query(updateImageQuery, [newImage.filename, ingredientID], (error, updateImageResult) => {
+//       if (error) {
+//         console.log("Error updating image URL");
+//         console.log(error);
+//         return res.status(500).json({ error });
+//       }
+
+//       fs.unlink('ingredientImages/' + imageUrl, (err) => {
+//         if (err) {
+//           console.log("Error deleting old image file");
+//           console.log(err);
+//         }
+//       });
+
+//       const updateRecordQuery = 'UPDATE ingredients SET IngredientName = ?, Price = ?, Description = ?, CategoryID = ? WHERE IngredientID = ?';
+//       database.query(updateRecordQuery, [IngredientName, Price, Description, CategoryID, ingredientID], (recordError, updateRecordResult) => {
+//         if (recordError) {
+//           console.log("Error updating ingredient record");
+//           console.log(recordError);
+//           return res.status(500).json({ error: recordError });
+//         }
+//         return res.json({ message: 'Updated ingredient successfully' });
+//       });
+//     });
+//   });
+// });
