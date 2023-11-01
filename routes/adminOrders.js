@@ -103,12 +103,46 @@ router.post('/addOrderItems', (req, res) => {
 });
 
 
+// router.delete('/deleteOrder/:id', (req, res) => {
+
+//     let id = parseInt(req.params.id);
+//     database.query("delete from orderItems where orderID = ?", [id], (err, result) => {
+//         if (err) {
+//             console.log("Error deleting order from orderItems table");
+//             console.log(err);
+//         }
+//         if (result) {
+//             database.query("delete from orderreviews where orderID = ?", [id], (err2, result2) => {
+//                 if (err2) {
+//                     console.log("Error deleting order review from orderreviews table");
+//                     console.log(err2);
+//                 }
+//                 if (result2) {
+//                     database.query("delete from orders where orderID = ?", [id], (err3, result3) => {
+//                         if (err2) {
+//                             console.log("Error deleting order from orders table");
+//                             console.log(err3);
+//                         }
+//                         if (result3) {
+//                             res.send({
+//                                 message: 'Deleted order successfully',
+        
+//                             });
+//                         }
+//                     });
+//                 }
+//             });
+//         }
+
+//     });
+// });
+
 router.delete('/deleteOrder/:id', (req, res) => {
 
     let id = parseInt(req.params.id);
-    database.query("delete from orderItems where orderID = ?", [id], (err, result) => {
+    database.query("delete from orderCustomizations where orderID = ?", [id], (err, result) => {
         if (err) {
-            console.log("Error deleting order from orderItems table");
+            console.log("Error deleting order from orderCustomizations table");
             console.log(err);
         }
         if (result) {
@@ -118,26 +152,33 @@ router.delete('/deleteOrder/:id', (req, res) => {
                     console.log(err2);
                 }
                 if (result2) {
-                    database.query("delete from orders where orderID = ?", [id], (err3, result3) => {
+                    database.query("delete from orderItems where orderID = ?", [id], (err3, result3) => {
                         if (err2) {
-                            console.log("Error deleting order from orders table");
+                            console.log("Error deleting order from orderItems table");
                             console.log(err3);
                         }
                         if (result3) {
-                            res.send({
-                                message: 'Deleted order successfully',
-        
+                            database.query("delete from orders where orderID = ?", [id], (err4, result4) => {
+                                if (err2) {
+                                    console.log("Error deleting order from orders table");
+                                    console.log(err4);
+                                }
+                                if (result4) {
+                                    res.send({
+                                        message: 'Deleted order successfully',
+                
+                                    });
+                                }
                             });
                         }
                     });
+        
                 }
             });
         }
 
     });
 });
-
-
 
 router.put('/updateOrderStatusById/:id', (req, res) => {
 

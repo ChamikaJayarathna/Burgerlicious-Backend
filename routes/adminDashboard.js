@@ -165,6 +165,24 @@ router.get('/getStatusExceptCompletedCount', (req, res) => {
     });
 });
 
+router.get('/Top10BestSellingProducts', (req, res) => {
 
+    let query = 'select products.ProductName, sum(products.ProductID) as TotalSales from orderItems inner join products on products.ProductID=orderItems.ProductID group by products.ProductID, products.ProductName order by TotalSales desc limit 10';
+
+
+    database.query(query, (err, result) => {
+        if (err) {
+            console.log("Error Getting Top 10 Products");
+        }
+        if (result) {
+            console.log(result);
+            res.send({
+                message: 'Top 10 Products',
+                data: result
+            });
+        }
+
+    });
+});
 
 module.exports = router;
