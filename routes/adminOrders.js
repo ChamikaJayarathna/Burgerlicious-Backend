@@ -44,16 +44,16 @@ router.post('/addOrder', (req, res) => {
 });
 
 
-router.get('/ingredients', (req, res) => {
+router.get('/products', (req, res) => {
 
-    let query = 'select * from ingredients';
+    let query = 'select * from products';
     database.query(query, (err, result) => {
         if (err) {
-            console.log("Error Retrieving ingredients");
+            console.log("Error Retrieving Products");
         }
         if (result) {
             res.send({
-                message: 'All ingredients data',
+                message: 'All Products data',
                 data: result
             });
         }
@@ -61,17 +61,17 @@ router.get('/ingredients', (req, res) => {
     });
 });
 
-router.get('/ingredients/:id', (req, res) => {
+router.get('/products/:id', (req, res) => {
 
     let id = parseInt(req.params.id);
-    database.query("select * from ingredients where IngredientID = ?", [id], (err, result) => {
+    database.query("select * from products where ProductID = ?", [id], (err, result) => {
         if (err) {
-            console.log("Error Retrieving ingredient");
+            console.log("Error Retrieving Product");
             console.log(err);
         }
         if (result) {
             res.send({
-                message: 'ingredient Data Retrieved',
+                message: 'Product Data Retrieved',
                 data: result
             });
         }
@@ -79,14 +79,14 @@ router.get('/ingredients/:id', (req, res) => {
     });
 });
 
-router.post('/addOrderCustomizations', (req, res) => {
+router.post('/addOrderItems', (req, res) => {
     let orderId = req.body.orderId;
     let data = req.body.data;
 
     for (let i = 0; i < data.length; i++) {
 
         let product = data[i];
-        database.query("insert into ordercustomizations (OrderID,Quantity,Subtotal,IngredientID) values (?,?,?,?)", [parseInt(orderId), product.Quantity, product.Subtotal, parseInt(product.IngredientID)], (err, result) => {
+        database.query("insert into orderitems (OrderID,Quantity,Subtotal,ProductID) values (?,?,?,?)", [parseInt(orderId), product.Quantity, product.Subtotal, parseInt(product.ProductID)], (err, result) => {
 
             if (err) {
                 console.log(err);
@@ -96,7 +96,7 @@ router.post('/addOrderCustomizations', (req, res) => {
     }
 
     res.send({
-        message: 'OrderCustomizations Inserted'
+        message: 'OrderItems Inserted'
     });
 
 
@@ -106,9 +106,9 @@ router.post('/addOrderCustomizations', (req, res) => {
 router.delete('/deleteOrder/:id', (req, res) => {
 
     let id = parseInt(req.params.id);
-    database.query("delete from orderCustomizations where orderID = ?", [id], (err, result) => {
+    database.query("delete from orderItems where orderID = ?", [id], (err, result) => {
         if (err) {
-            console.log("Error deleting order from orderCustomizations table");
+            console.log("Error deleting order from orderItems table");
             console.log(err);
         }
         if (result) {
@@ -160,7 +160,7 @@ router.put('/updateOrderStatusById/:id', (req, res) => {
 router.get('/getAllOrderItemsByOrderID/:id', (req, res) => {
 
     let id = parseInt(req.params.id);
-    database.query("select * from ordercustomizations inner join ingredients on ingredients.IngredientID = ordercustomizations.IngredientID where orderID = ?", [id], (err, result) => {
+    database.query("select * from orderitems inner join products on products.ProductID = orderitems.ProductID where orderID = ?", [id], (err, result) => {
         if (err) {
             console.log("Error Retrieving Order Items");
             console.log(err);
@@ -254,7 +254,7 @@ router.put('/updateOrderById/:id', (req, res) => {
 router.get('/getOrderItemById/:id', (req, res) => {
 
     let id = parseInt(req.params.id);
-    database.query("select * from ordercustomizations inner join ingredients on ingredients.IngredientID = ordercustomizations.IngredientID where OrderCustomizationID = ?", [id], (err, result) => {
+    database.query("select * from orderitems inner join products on products.ProductID = orderitems.ProductID where OrderItemID = ?", [id], (err, result) => {
         if (err) {
             console.log("Error Retrieving Order Item");
             console.log(err);
@@ -274,7 +274,7 @@ router.put('/updateOrderItemById/:id', (req, res) => {
     let id = parseInt(req.params.id);
     let Quantity=req.body.Quantity;
     let Subtotal=req.body.Subtotal;
-    database.query("update ordercustomizations set Quantity =?, Subtotal =? where OrderCustomizationID = ?", [Quantity,Subtotal,id], (err, result) => {
+    database.query("update orderitems set Quantity =?, Subtotal =? where OrderItemID = ?", [Quantity,Subtotal,id], (err, result) => {
         if (err) {
             console.log("Error Updating Order Items");
             console.log(err);
