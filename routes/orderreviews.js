@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2/promise'); // Import the mysql2/promise package
-
 const {config} = require('../config/helpers'); // Import the MySQL configuration
 
 // Create a MySQL connection pool
@@ -80,8 +79,29 @@ router.get('/orderreviews/:ReviewID', async (req, res) => {
   }
 });
 
+// GET order reviews based on a keyword search
+router.get('/orderreviews-search/:search', async (req, res) => {
+  try {
+    const { search } = req.params; // Corrected the variable name to 'search'
 
+    // Get a connection from the pool
+    const connection = await pool.getConnection();
 
+    // Query to fetch order reviews that match the keyword in the burgerName
+    const query = 'SELECT * FROM orderreviews WHERE burgerName LIKE ?';
+    
+    // Execute the query with '%' to allow partial matches
+    const [rows] = await connection.query(query, [`%${search}%`]);
+
+    // Release the connection
+    connection.release();
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Error retrieving order reviews:', error.message);
+    res.status(500).json({ error: 'An error occurred while fetching order reviews' });
+  }
+});
 
 // POST order reviews
 router.post('/orderreviews', async (req, res) => {

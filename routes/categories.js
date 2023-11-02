@@ -48,6 +48,8 @@ router.get('/categories', async (req, res) => {
   }
 });
 
+
+
 // Edit categories
 router.put('/categories/:id', async (req, res) => {
   try {

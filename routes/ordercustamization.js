@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2/promise'); // Import the mysql2/promise package
+const fs = require('fs');
+const path = require('path');
 
 const {config} = require('../config/helpers'); // Import the MySQL configuration
 
@@ -137,6 +139,50 @@ router.delete('/ordercustomizations/:id', async (req, res) => {
   } catch (error) {
     console.error('Error deleting order customization:', error.message);
     res.status(500).json({ error: 'An error occurred while deleting the order customization' });
+  }
+});
+
+router.post('/ordercustomizations/save-image', upload.single('image'), (req, res) => {
+  try {
+    // Assuming the image data is sent in the request body.
+    const imageData = req.body;
+
+    // Generate a unique filename or use an existing name
+    const uniqueFilename = `${Date.now()}.png`;
+
+    // Define the path to your assets folder
+    const assetsFolder = path.join(__dirname, 'ingredientImages');
+
+    // Ensure the assets folder exists
+    if (!fs.existsSync(assetsFolder)) {
+      fs.mkdirSync(assetsFolder);
+    }
+
+    // Define the full path for the saved image
+    const imagePath = path.join(assetsFolder, uniqueFilename);
+
+    // Write the image data to the file
+    fs.writeFileSync(imagePath, imageData);
+
+    res.status(200).send('Image saved successfully.');
+  } catch (error) {
+    console.error('Failed to save the image:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+// POST - create a ingredient image record
+router.post('/addIngredientImage',upload.single('image'), (req, res) => {
+
+  const imageUrl = req.file.filename;
+  console.log(imageUrl);
+  
+  if(req.file.filename){
+    //res.send(imageUrl);
+    res.send({
+      message: 'Image Url',
+      data: imageUrl
+  });
   }
 });
 
