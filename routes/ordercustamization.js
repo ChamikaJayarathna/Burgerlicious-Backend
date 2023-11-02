@@ -84,7 +84,7 @@ router.get('/customize-categories/:CategoryID', async (req, res) => {
       res.json(rows);
   } catch (error) {
     console.error('Error retrieving order review:', error.message);
-    res.status(500).json({ error: 'An error occurred while fetching the order review' });
+    res.status(500).json({ error: 'An error occurred while fetching the order recustomizationsview' });
   }
 });
 
@@ -92,13 +92,13 @@ router.get('/customize-categories/:CategoryID', async (req, res) => {
 // POST order customizations
 router.post('/ordercustomizations', async (req, res) => {
   try {
-    const { OrderID, IngredientID } = req.body;
+    const { ingredientID, customizeName, customizeImg } = req.body;
 
     // Get a connection from the pool
     const connection = await pool.getConnection();
 
     // Insert order customization data
-    await connection.query('INSERT INTO OrderCustomizations (OrderID, IngredientID) VALUES (?, ?)', [OrderID, IngredientID]);
+    await connection.query('INSERT INTO `ordercustomizations`(`ingredientID`, `customizeName`, `customizeImg`) VALUES (?, ?, ?)', [ ingredientID, customizeName, customizeImg ]);
 
     // Release the connection
     connection.release();
@@ -110,7 +110,7 @@ router.post('/ordercustomizations', async (req, res) => {
   }
 });
 
-// PUT (Update) order customizations
+/* PUT (Update) order customizations
 router.put('/ordercustomizations/:id', async (req, res) => {
   try {
     const orderCustomizationID = req.params.id;
@@ -134,6 +134,8 @@ router.put('/ordercustomizations/:id', async (req, res) => {
     res.status(500).json({ error: 'An error occurred while updating the order customization' });
   }
 });
+
+*/
 
 // DELETE order customizations
 router.delete('/ordercustomizations/:id', async (req, res) => {

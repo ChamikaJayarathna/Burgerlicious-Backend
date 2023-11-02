@@ -62,10 +62,17 @@ router.post('/signin', async (req, res) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Create and send JWT token
     const token = jwt.sign({ userId: userRows[0].UserID }, 'yourSecretKey');
+
+    // Create a response object with UserID, Username, and token
+    const response = {
+      UserID: userRows[0].UserID,
+      Username: userRows[0].Username,
+      token: token,
+    };
+
     connection.release();
-    res.json({ token });
+    res.json(response);
   } catch (error) {
     console.error('Error signing in:', error.message);
     res.status(500).json({ error: 'An error occurred while signing in' });
