@@ -1,8 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const mysql = require('mysql2/promise'); // Import the mysql2/promise package
+
+const multer = require('multer');
 const fs = require('fs');
-const path = require('path');
+
+
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'ingredientImages/');
+  },
+  filename: function (req, file, cb) {
+    const uniqueFileName = Date.now() + '-' + file.originalname;
+    cb(null, uniqueFileName);
+  },
+});
+
+const upload = multer({ storage: storage });
 
 const {config} = require('../config/helpers'); // Import the MySQL configuration
 
@@ -142,37 +156,8 @@ router.delete('/ordercustomizations/:id', async (req, res) => {
   }
 });
 
-router.post('/ordercustomizations/save-image', upload.single('image'), (req, res) => {
-  try {
-    // Assuming the image data is sent in the request body.
-    const imageData = req.body;
-
-    // Generate a unique filename or use an existing name
-    const uniqueFilename = `${Date.now()}.png`;
-
-    // Define the path to your assets folder
-    const assetsFolder = path.join(__dirname, 'ingredientImages');
-
-    // Ensure the assets folder exists
-    if (!fs.existsSync(assetsFolder)) {
-      fs.mkdirSync(assetsFolder);
-    }
-
-    // Define the full path for the saved image
-    const imagePath = path.join(assetsFolder, uniqueFilename);
-
-    // Write the image data to the file
-    fs.writeFileSync(imagePath, imageData);
-
-    res.status(200).send('Image saved successfully.');
-  } catch (error) {
-    console.error('Failed to save the image:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
 // POST - create a ingredient image record
-router.post('/addIngredientImage',upload.single('image'), (req, res) => {
+router.post('/ordercustomizations/save-image',upload.single('image'), (req, res) => {
 
   const imageUrl = req.file.filename;
   console.log(imageUrl);
@@ -185,5 +170,7 @@ router.post('/addIngredientImage',upload.single('image'), (req, res) => {
   });
   }
 });
+
+
 
 module.exports = router;
