@@ -188,11 +188,11 @@ router.put('/updateProduct/:id', (req, res) => {
       const updateRecordQuery = 'UPDATE products SET ProductName = ?, Price = ?, Description = ?, Rating = ?, CategoryID = ? WHERE ProductID = ?';
       database.query(updateRecordQuery, [ProductName, Price, Description, Rating, CategoryID, ProductID], (recordError, updateRecordResult) => {
         if (recordError) {
-          console.log("Error updating ingredient record");
+          console.log("Error updating product record");
           console.log(recordError);
           return res.status(500).json({ error: recordError });
         }
-        return res.json({ message: 'Updated ingredient successfully' });
+        return res.json({ message: 'Updated product successfully' });
       });
     });
   });
