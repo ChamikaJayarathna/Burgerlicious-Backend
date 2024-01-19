@@ -4,8 +4,8 @@ const bcrypt = require('bcrypt');
 
 const config = {
     host: 'localhost',
-    user: 'root',
-    password: '',
+    user: 'burgerlicious',
+    password: 'burgerlicious',
     database: 'burgerlicious',
     port: 3306
   };
