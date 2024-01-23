@@ -4,6 +4,8 @@ const mysql = require('mysql2/promise'); // Import the mysql2/promise package
 
 const multer = require('multer');
 const fs = require('fs');
+const base64Img = require("base64-img");
+const path = require('path');
 
 
 const storage = multer.diskStorage({
@@ -62,6 +64,40 @@ router.get('/customize-categories', async (req, res) => {
   }
 });
 
+
+
+// GET order review by ReviewID with ingredient names as an array
+router.get("/customizeuser-categories/:CategoryID", async (req, res) => {
+  try {
+    const { CategoryID } = req.params; // Extract ReviewID from the URL parameters
+
+    // Get a connection from the pool
+    const connection = await pool.getConnection();
+
+    // SQL query to fetch the order review by ReviewID with ingredient information
+    //  const query = `SELECT * from ingredients where CategoryID = ?;`;
+
+    const query = `SELECT IngredientID,IngredientName,Price,Description, ImageURL,CategoryID FROM ingredients where CategoryID = ?`;
+
+    // Execute the query with ReviewID as a parameter
+    const [rows] = await connection.query(query, [CategoryID]);
+
+    // Release the connection
+    connection.release();
+
+    // Return the modified JSON response
+    res.json(rows);
+  } catch (error) {
+    console.error("Error retrieving order review:", error.message);
+    res
+      .status(500)
+      .json({
+        error:
+          "An error occurred while fetching the order recustomizationsview",
+      });
+  }
+});
+
 // GET order review by ReviewID with ingredient names as an array
 router.get('/customize-categories/:CategoryID', async (req, res) => {
   try {
@@ -111,6 +147,7 @@ router.post('/ordercustomizations', async (req, res) => {
   }
 });
 
+
 /* PUT (Update) order customizations
 router.put('/ordercustomizations/:id', async (req, res) => {
   try {
@@ -159,21 +196,57 @@ router.delete('/ordercustomizations/:id', async (req, res) => {
   }
 });
 
-// POST - create a ingredient image record
-router.post('/ordercustomizations/save-image',upload.single('image'), (req, res) => {
+// // POST - create a ingredient image record
+// router.post('/ordercustomizations/save-image',upload.single('image'), (req, res) => {
 
-  const imageUrl = req.file.filename;
-  console.log(imageUrl);
+//   const imageUrl = req.file.filename;
+//   console.log(imageUrl);
   
-  if(req.file.filename){
-    //res.send(imageUrl);
-    res.send({
-      message: 'Image Url',
-      data: imageUrl
+//   if(req.file.filename){
+//     //res.send(imageUrl);
+//     res.send({
+//       message: 'Image Url',
+//       data: imageUrl
+//   });
+//   }
+// });
+
+router.post("/ordercustomizations/save-image", (req, res) => {
+  const { burgerName, capturedImage } = req.body;
+
+  // Decode base64 image
+  base64Img.img(capturedImage, 'ingredientImages', burgerName, (err, filepath) => {
+    if (err) {
+      console.error('Error decoding and saving image:', err);
+      res.status(500).json({ error: 'Failed to save image' });
+    } else {
+      console.log('Image saved successfully:', filepath);
+      res.json({ message: 'Image saved successfully' });
+    }
   });
-  }
 });
 
-
+router.get('/ordercustomizations/:imagePath', (req, res) => {
+  try {
+    const imagePath = decodeURIComponent(req.params.imagePath);
+    const imageFilePath = path.join(__dirname, '..','ingredientImages', imagePath);
+    // Check if the file exists
+    if (fs.existsSync(imageFilePath)) {
+      // Read the image file synchronously
+      const imageFileData = fs.readFileSync(imageFilePath);
+      // Convert the binary data to a base64-encoded Data URL
+      const dataUrl = `data:image/*;base64,${imageFileData.toString('base64')}`;
+      // Send the Data URL as the response
+      res.send(dataUrl);
+    } else {
+      // If the file doesn't exist, send a 404 Not Found response
+      res.status(404).send('Not Found');
+    }
+  } catch (error) {
+    console.error('Error handling image request:', error);
+    // Handle the error and send an appropriate response
+    res.status(500).send('Internal Server Error');
+  }
+});
 
 module.exports = router;
