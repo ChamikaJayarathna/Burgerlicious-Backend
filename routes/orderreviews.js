@@ -106,7 +106,7 @@ router.get('/orderreviews-search/:search', async (req, res) => {
 // POST order reviews
 router.post('/orderreviews', async (req, res) => {
   try {
-    const { OrderID, UserID, Rating, Comment, imageURL, burgerName, Name } = req.body;
+    const { OrderID, UserID, Rating, Comment, customizeImg, burgerName, Name } = req.body;
 
     // Get a connection from the pool
     const connection = await pool.getConnection();
@@ -114,7 +114,7 @@ router.post('/orderreviews', async (req, res) => {
     // Insert order review data
     await connection.query(
       'INSERT INTO OrderReviews (OrderID, UserID, Rating, Comment, imageURL, burgerName, Name) VALUES (?, ?, ?, ?, ?, ?, ?)',
-      [OrderID, UserID, Rating, Comment, imageURL, burgerName, Name]
+      [OrderID, UserID, Rating, Comment, customizeImg, burgerName, Name]
     );
 
     // Release the connection
