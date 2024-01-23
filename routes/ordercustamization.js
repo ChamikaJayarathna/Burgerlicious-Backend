@@ -71,9 +71,9 @@ router.get('/customize-categories/:CategoryID', async (req, res) => {
     const connection = await pool.getConnection();
 
     // SQL query to fetch the order review by ReviewID with ingredient information
-     const query = `SELECT * from ingredients where CategoryID = ?;`;
+    //  const query = `SELECT * from ingredients where CategoryID = ?;`;
       
-    // const query = `SELECT IngredientID,IngredientName,Price,Description,CONCAT("http://localhost:3600/ingredientImages/",ImageURL) as ImageURL,CategoryID FROM ingredients where CategoryID = ?`;
+    const query = `SELECT IngredientID,IngredientName,Price,Description,CONCAT("http://localhost:3600/ingredientImages/",ImageURL) as ImageURL,CategoryID FROM ingredients where CategoryID = ?`;
 
     // Execute the query with ReviewID as a parameter
     const [rows] = await connection.query(query, [CategoryID]);
