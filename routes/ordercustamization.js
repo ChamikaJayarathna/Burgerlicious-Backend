@@ -8,10 +8,10 @@ const fs = require('fs');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'ingredientImages/');
+    cb(null, 'customizeImages/');
   },
   filename: function (req, file, cb) {
-    const uniqueFileName = Date.now() + '-' + file.originalname;
+    const uniqueFileName = Date.now() + '-' + file.originalname + '.png';
     cb(null, uniqueFileName);
   },
 });
